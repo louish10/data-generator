@@ -19,6 +19,8 @@ struct Args {
     number_of_files: usize,
     #[arg(long, short='n', default_value_t = 10)]
     number_of_lines: usize,
+    #[arg(long, short='l', default_value_t = 10)]
+    filename_length: usize,
 }
 
 fn random_string(n: usize) -> String {
@@ -44,8 +46,13 @@ fn main() -> std::io::Result<()>{
     let _ = fs::create_dir_all(path);
 
     for _ in 0..args.number_of_files{
-        let filepath = path.join(random_string(3));
-        write_file(&filepath, &args)?;
+        loop {
+            let filepath = path.join(random_string(args.filename_length));
+            if !filepath.exists() {
+                write_file(&filepath, &args)?;
+                break;
+            }
+        }
     }
 
     Ok(())
